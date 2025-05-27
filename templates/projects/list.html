@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог проектов{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">Каталог проектов</h1>
+        {% if user.role == 'manager' %}
+        <a href="{% url 'create_project' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Создать проект
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Форма поиска и фильтрации -->
+    <div class="filters-section shadow-sm">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="search" class="form-label">
+                    <i class="bi bi-search me-1"></i>Поиск по названию или номеру
+                </label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search_query }}" placeholder="Введите текст для поиска...">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i>Найти
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="status" class="form-label">
+                    <i class="bi bi-funnel me-1"></i>Статус проекта
+                </label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">Все статусы</option>
+                    {% for status in statuses %}
+                        <option value="{{ status }}" {% if status == status_filter %}selected{% endif %}>
+                            {% if status == 'recruiting' %}
+                                Набор участников
+                            {% elif status == 'in_progress' %}
+                                В работе
+                            {% else %}
+                                Завершён
+                            {% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label d-block text-transparent">
+                    <i class="bi bi-filter me-1"></i>Фильтр
+                </label>
+                <div class="show-my-checkbox">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="show_my" 
+                               name="show_my" {% if show_my %}checked{% endif %}>
+                        <label class="form-check-label w-100" for="show_my">
+                            <i class="bi bi-bookmark-star me-2"></i>Мои проекты
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if projects %}
+        <div class="row">
+            {% for project in projects %}
+            <div class="col-md-6 mb-4">
+                <div class="card project-card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">
+                                <span class="text-muted">#{{ project.0 }}:</span> {{ project.1 }}
+                            </h5>
+                            <span class="status-badge status-{{ project.3 }}">
+                                {% if project.3 == 'recruiting' %}
+                                    Набор участников
+                                {% elif project.3 == 'in_progress' %}
+                                    В работе
+                                {% else %}
+                                    Завершён
+                                {% endif %}
+                            </span>
+                        </div>
+                        <p class="card-text text-muted mb-3">{{ project.2|default:"Описание отсутствует" }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-person me-1"></i>{{ project.5 }} {{ project.6 }}
+                            </small>
+                            <a href="{% url 'project_detail' project.0 %}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-arrow-right me-1"></i>Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <div>
+                {% if search_query or status_filter or show_my %}
+                    По вашему запросу ничего не найдено.
+                    <a href="{% url 'project_list' %}" class="alert-link">Сбросить фильтры</a>
+                {% else %}
+                    В системе пока нет проектов.
+                    {% if user.role == 'manager' %}
+                        <a href="{% url 'create_project' %}" class="alert-link">Создать первый проект</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Автоматическая отправка формы при изменении чекбокса или статуса -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const showMyCheckbox = document.getElementById('show_my');
+    const statusSelect = document.getElementById('status');
+
+    showMyCheckbox.addEventListener('change', () => form.submit());
+    statusSelect.addEventListener('change', () => form.submit());
+});
+</script>
+{% endblock %} 

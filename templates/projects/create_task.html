@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание задачи{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Создание новой задачи</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="task_name" class="form-label">Название задачи</label>
+                <input type="text" class="form-control" id="task_name" name="task_name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="task_description" class="form-label">Описание задачи</label>
+                <textarea class="form-control" id="task_description" name="task_description" rows="4"></textarea>
+            </div>
+
+            {% if members %}
+            <div class="mb-3">
+                <label for="worker_id" class="form-label">Назначить исполнителя</label>
+                <select class="form-select" id="worker_id" name="worker_id">
+                    <option value="">Не назначать</option>
+                    {% for member in members %}
+                        <option value="{{ member.0 }}">{{ member.1 }} {{ member.2 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Создать задачу</button>
+                <a href="{% url 'project_detail' project_id %}" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

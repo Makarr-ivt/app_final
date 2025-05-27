@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание проекта{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Создание нового проекта</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="project_name" class="form-label">Название проекта</label>
+                <input type="text" class="form-control" id="project_name" name="project_name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="project_description" class="form-label">Описание проекта</label>
+                <textarea class="form-control" id="project_description" name="project_description" rows="4"></textarea>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Создать проект</button>
+                <a href="{% url 'project_list' %}" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 
