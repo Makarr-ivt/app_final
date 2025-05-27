@@ -3,8 +3,6 @@ CREATE OR REPLACE FUNCTION public.join_project(
 	p_user_id integer)
     RETURNS boolean
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 BEGIN
     -- Проверяем, что проект существует и находится в статусе набора

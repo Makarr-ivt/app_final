@@ -6,8 +6,6 @@ CREATE OR REPLACE FUNCTION public.create_task(
 	p_worker_id integer DEFAULT NULL::integer)
     RETURNS integer
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 DECLARE
     v_task_id INT;
@@ -58,8 +56,6 @@ CREATE OR REPLACE FUNCTION public.create_task(
 	p_worker_id integer DEFAULT NULL::integer)
     RETURNS integer
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 DECLARE
     new_task_id INTEGER;

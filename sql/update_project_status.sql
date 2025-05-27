@@ -4,8 +4,6 @@ CREATE OR REPLACE FUNCTION public.update_project_status(
 	p_new_status project_status)
     RETURNS boolean
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 BEGIN
     UPDATE projects

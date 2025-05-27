@@ -3,8 +3,6 @@ CREATE OR REPLACE FUNCTION public.delete_task(
 	p_manager_id integer)
     RETURNS boolean
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 BEGIN
     -- Проверяем, что задача существует и принадлежит проекту менеджера

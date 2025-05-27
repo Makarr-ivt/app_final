@@ -3,8 +3,7 @@ CREATE OR REPLACE FUNCTION public.assign_task(
 	p_worker_id integer)
     RETURNS boolean
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
+
 AS $BODY$
 DECLARE
     v_project_id INT;

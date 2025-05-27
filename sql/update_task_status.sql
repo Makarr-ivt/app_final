@@ -4,8 +4,6 @@ CREATE OR REPLACE FUNCTION public.update_task_status(
 	p_new_status task_status)
     RETURNS boolean
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 BEGIN
     -- Проверяем, что работник является исполнителем задачи

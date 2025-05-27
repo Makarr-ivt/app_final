@@ -6,8 +6,6 @@ CREATE OR REPLACE FUNCTION public.register_user(
 	p_role user_role)
     RETURNS integer
     LANGUAGE 'plpgsql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 DECLARE
     new_user_id INTEGER;
