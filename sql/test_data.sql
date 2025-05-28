@@ -86,10 +86,10 @@ BEGIN
     ) INTO project3_id;
 
     -- Добавляем участников в проекты
-    PERFORM join_project(project2_id, maria_id);
-    PERFORM join_project(project2_id, alexey_id);
-    PERFORM join_project(project3_id, elena_id);
-    PERFORM join_project(project3_id, maria_id);
+    CALL join_project(project2_id, maria_id);
+    CALL join_project(project2_id, alexey_id);
+    CALL join_project(project3_id, elena_id);
+    CALL join_project(project3_id, maria_id);
 
     -- Создаем задачи для первого проекта (пока без исполнителей)
     SELECT create_task(
@@ -114,7 +114,7 @@ BEGIN
         'Разработка интерфейса основных экранов приложения',
         maria_id
     ) INTO task_id;
-    PERFORM update_task_status(task_id, maria_id, 'completed'::task_status);
+    CALL update_task_status(task_id, maria_id, 'completed'::task_status);
 
     SELECT create_task(
         project2_id,
@@ -123,7 +123,7 @@ BEGIN
         'Создание системы отображения прогресса пользователя',
         alexey_id
     ) INTO task_id;
-    PERFORM update_task_status(task_id, alexey_id, 'in_progress'::task_status);
+    CALL update_task_status(task_id, alexey_id, 'in_progress'::task_status);
 
     SELECT create_task(
         project2_id,
@@ -140,7 +140,7 @@ BEGIN
         'Перенос данных из старой системы',
         elena_id
     ) INTO task_id;
-    PERFORM update_task_status(task_id, elena_id, 'completed'::task_status);
+    CALL update_task_status(task_id, elena_id, 'completed'::task_status);
 
     SELECT create_task(
         project3_id,
@@ -149,9 +149,9 @@ BEGIN
         'Создание системы формирования аналитических отчетов',
         maria_id
     ) INTO task_id;
-    PERFORM update_task_status(task_id, maria_id, 'completed'::task_status);
+    CALL update_task_status(task_id, maria_id, 'completed'::task_status);
 
     -- Обновляем статусы проектов
-    PERFORM update_project_status(project2_id, ivan_id, 'in_progress'::project_status);
-    PERFORM update_project_status(project3_id, anna_id, 'completed'::project_status);
+    CALL update_project_status(project2_id, ivan_id, 'in_progress'::project_status);
+    CALL update_project_status(project3_id, anna_id, 'completed'::project_status);
 END $$; 
