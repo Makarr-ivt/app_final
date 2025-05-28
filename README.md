@@ -123,14 +123,7 @@ app_final/
 │   ├── enum_types.sql    # Определение типов
 │   ├── indexes.sql       # Индексы БД
 │   ├── functions/        # SQL функции:
-│   │   ├── register_user.sql
-│   │   ├── create_project.sql
-│   │   ├── create_task.sql
-│   │   ├── join_project.sql
-│   │   ├── leave_project.sql
-│   │   ├── assign_task.sql
-│   │   ├── update_project_status.sql
-│   │   └── update_task_status.sql
+│   ├── procedures/        # SQL процедуры:
 │   └── test_data.sql     # Тестовые данные
 │
 ├── static/               # Статические файлы
