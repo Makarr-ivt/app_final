@@ -549,14 +549,12 @@ def assign_task(request, task_id):
                     messages.success(request, 'Задача взята в работу')
             except Exception as e:
                 messages.error(request, str(e))
-
             # Получаем project_id для редиректа
             cursor.execute(
                 "SELECT project_id FROM tasks WHERE id = %s",
                 [task_id]
             )
             project_id = cursor.fetchone()[0]
-
     return redirect('project_detail', project_id=project_id)
 
 @login_required

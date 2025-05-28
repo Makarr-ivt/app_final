@@ -106,16 +106,52 @@ python manage.py runserver
 app_final/
 ├── app/                    # Основное приложение
 │   ├── migrations/        # Миграции Django
-│   ├── templates/        # HTML шаблоны
-│   ├── models.py         # Модели Django
-│   ├── views.py         # Представления
-│   ├── forms.py         # Формы
-│   └── urls.py          # URL маршруты
+│   ├── __pycache__/      # Кэш Python
+│   ├── models.py         # Модели (User, Project, Task)
+│   ├── views.py          # Представления и бизнес-логика
+│   ├── forms.py          # Формы для обработки данных
+│   ├── urls.py           # URL маршруты
+│   ├── admin.py          # Настройки админ-панели
+│   ├── apps.py           # Конфигурация приложения
+│   ├── tests.py          # Тесты
+│   └── __init__.py       # Инициализация пакета
+│
+├── project_management/    # Конфигурация проекта
+│
 ├── sql/                  # SQL скрипты
-├── static/              # Статические файлы
-├── templates/           # Общие шаблоны
-├── .env                # Переменные окружения
-├── .env.example        # Пример переменных окружения
+│   ├── tables.sql        # Создание таблиц
+│   ├── enum_types.sql    # Определение типов
+│   ├── indexes.sql       # Индексы БД
+│   ├── functions/        # SQL функции:
+│   │   ├── register_user.sql
+│   │   ├── create_project.sql
+│   │   ├── create_task.sql
+│   │   ├── join_project.sql
+│   │   ├── leave_project.sql
+│   │   ├── assign_task.sql
+│   │   ├── update_project_status.sql
+│   │   └── update_task_status.sql
+│   └── test_data.sql     # Тестовые данные
+│
+├── static/               # Статические файлы
+│   └── css/              # Стили для шаблонов
+│
+├── templates/            # HTML шаблоны
+│   ├── base.html        # Базовый шаблон
+│   ├── auth/            # Шаблоны аутентификации
+│   │   ├── login.html
+│   │   └── register.html
+│   └── projects/        # Шаблоны проектов
+│       ├── list.html
+│       ├── detail.html
+│       ├── create.html
+│       └── create_task.html
+│
+├── .git/                # Git репозиторий
+├── .gitignore          # Игнорируемые файлы Git
+├── README.md           # Документация проекта
+├── generate_passwords.py # Утилита для генерации паролей (для создания тестовых данных пользователей не вручную, а автоматически)
 ├── requirements.txt    # Зависимости проекта
-└── manage.py           # Скрипт управления Django
+├── manage.py          # Скрипт управления Django
+└── venv/              # Виртуальное окружение Python
 ```
