@@ -40,7 +40,11 @@
                             <strong>Роль:</strong>
                         </div>
                         <div class="col-sm-9">
-                            {{ user.role }}
+                            {% if user.role == 'manager' %}
+                                менеджер
+                            {% else %}
+                                работник
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row mb-3">
