@@ -1,7 +1,6 @@
-CREATE OR REPLACE FUNCTION public.join_project(
+CREATE OR REPLACE PROCEDURE public.join_project(
 	p_project_id integer,
 	p_user_id integer)
-    RETURNS boolean
     LANGUAGE 'plpgsql'
 AS $BODY$
 BEGIN
@@ -10,7 +9,7 @@ BEGIN
         SELECT 1 FROM projects 
         WHERE id = p_project_id AND status = 'recruiting'
     ) THEN
-        RETURN FALSE;
+        RAISE EXCEPTION 'Проект не найден или не находится в статусе набора';
     END IF;
     
     -- Проверяем, что пользователь является работником
@@ -18,14 +17,12 @@ BEGIN
         SELECT 1 FROM users 
         WHERE id = p_user_id AND role = 'worker'
     ) THEN
-        RETURN FALSE;
+        RAISE EXCEPTION 'Только работники могут присоединяться к проектам';
     END IF;
     
     -- Добавляем пользователя в проект
     INSERT INTO project_members (project_id, user_id)
     VALUES (p_project_id, p_user_id)
     ON CONFLICT DO NOTHING;
-    
-    RETURN TRUE;
 END;
 $BODY$;

@@ -1,7 +1,6 @@
-CREATE OR REPLACE FUNCTION public.delete_task(
+CREATE OR REPLACE PROCEDURE public.delete_task(
 	p_task_id integer,
 	p_manager_id integer)
-    RETURNS boolean
     LANGUAGE 'plpgsql'
 AS $BODY$
 BEGIN
@@ -27,7 +26,5 @@ BEGIN
 
     -- Удаляем задачу
     DELETE FROM tasks WHERE id = p_task_id;
-    
-    RETURN TRUE;
 END;
 $BODY$;

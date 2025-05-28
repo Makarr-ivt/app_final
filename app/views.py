@@ -325,54 +325,27 @@ def join_project(request, project_id):
         messages.error(request, 'Только работники могут присоединяться к проектам')
         return redirect('project_detail', project_id=project_id)
 
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT join_project(%s, %s)", [project_id, request.user.id])
-        success = cursor.fetchone()[0]
-
-        if success:
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("CALL join_project(%s, %s)", [project_id, request.user.id])
             messages.success(request, 'Вы успешно присоединились к проекту')
-        else:
-            messages.error(request, 'Не удалось присоединиться к проекту')
+    except Exception as e:
+        messages.error(request, str(e))
 
     return redirect('project_detail', project_id=project_id)
 
 @login_required
 def leave_project(request, project_id):
     if request.method == 'POST':
-        with connection.cursor() as cursor:
-            # Проверяем, что пользователь является участником проекта
-            cursor.execute("""
-                SELECT EXISTS(
-                    SELECT 1 FROM project_members 
-                    WHERE project_id = %s AND user_id = %s
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "CALL leave_project(%s, %s)",
+                    [project_id, request.user.id]
                 )
-            """, [project_id, request.user.id])
-            is_member = cursor.fetchone()[0]
-
-            if not is_member:
-                messages.error(request, 'Вы не являетесь участником проекта')
-                return redirect('project_detail', project_id=project_id)
-
-            # Проверяем, что пользователь не является менеджером проекта
-            cursor.execute("""
-                SELECT EXISTS(
-                    SELECT 1 FROM projects 
-                    WHERE id = %s AND manager_id = %s
-                )
-            """, [project_id, request.user.id])
-            is_manager = cursor.fetchone()[0]
-
-            if is_manager:
-                messages.error(request, 'Менеджер не может покинуть свой проект')
-                return redirect('project_detail', project_id=project_id)
-
-            # Используем объединенную функцию leave_project
-            cursor.execute(
-                "SELECT leave_project(%s, %s)",
-                [project_id, request.user.id]
-            )
-
-            messages.success(request, 'Вы успешно покинули проект')
+                messages.success(request, 'Вы успешно покинули проект')
+        except Exception as e:
+            messages.error(request, str(e))
 
     return redirect('project_list')
 
@@ -406,85 +379,38 @@ def remove_member(request, project_id, user_id):
                 messages.error(request, 'Нельзя удалить менеджера проекта')
                 return redirect('project_detail', project_id=project_id)
 
-            # Используем объединенную функцию leave_project
-            cursor.execute(
-                "SELECT leave_project(%s, %s)",
-                [project_id, user_id]
-            )
-
-            messages.success(request, 'Участник успешно удален из проекта')
+            try:
+                cursor.execute(
+                    "CALL leave_project(%s, %s)",
+                    [project_id, user_id]
+                )
+                messages.success(request, 'Участник успешно удален из проекта')
+            except Exception as e:
+                messages.error(request, str(e))
 
     return redirect('project_detail', project_id=project_id)
 
 @login_required
 def change_project_status(request, project_id):
     if request.method == 'POST':
-        with connection.cursor() as cursor:
-            # Получаем текущий статус проекта
-            cursor.execute("""
-                SELECT status 
-                FROM projects 
-                WHERE id = %s AND manager_id = %s
-            """, [project_id, request.user.id])
-            result = cursor.fetchone()
+        new_status = request.POST.get('status')
+        
+        if new_status not in ['recruiting', 'in_progress', 'completed']:
+            messages.error(request, 'Некорректный статус проекта')
+            return redirect('project_detail', project_id=project_id)
 
-            if not result:
-                messages.error(request, 'У вас нет прав для изменения статуса проекта')
-                return redirect('project_detail', project_id=project_id)
-
-            current_status = result[0]
-            new_status = None
-
-            # Определяем новый статус
-            if current_status == 'recruiting':
-                # Проверяем наличие работников в проекте
-                cursor.execute("""
-                    SELECT EXISTS(
-                        SELECT 1 
-                        FROM project_members 
-                        WHERE project_id = %s
-                    )
-                """, [project_id])
-                has_workers = cursor.fetchone()[0]
-
-                if not has_workers:
-                    messages.error(request, 'Невозможно запустить проект без участников')
-                    return redirect('project_detail', project_id=project_id)
-                
-                new_status = 'in_progress'
-
-            elif current_status == 'in_progress':
-                # Проверяем наличие завершенных задач
-                cursor.execute("""
-                    SELECT EXISTS(
-                        SELECT 1 
-                        FROM tasks 
-                        WHERE project_id = %s AND status = 'completed'
-                    )
-                """, [project_id])
-                has_completed_tasks = cursor.fetchone()[0]
-
-                if not has_completed_tasks:
-                    messages.error(request, 'Невозможно завершить проект без выполненных задач')
-                    return redirect('project_detail', project_id=project_id)
-                
-                new_status = 'completed'
-            
-            if new_status:
-                # Используем функцию БД для обновления статуса
+        try:
+            with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT update_project_status(%s, %s, %s::project_status)",
+                    "CALL update_project_status(%s, %s, %s)",
                     [project_id, request.user.id, new_status]
                 )
-                if cursor.fetchone()[0]:
-                    status_messages = {
-                        'in_progress': 'Проект запущен',
-                        'completed': 'Проект завершен'
-                    }
-                    messages.success(request, status_messages[new_status])
-                else:
-                    messages.error(request, 'Не удалось изменить статус проекта')
-
+                messages.success(request, 'Статус проекта успешно обновлен')
+        except Exception as e:
+            messages.error(request, str(e))
+        
+        return redirect('project_detail', project_id=project_id)
+    
     return redirect('project_detail', project_id=project_id)
 
 @login_required
@@ -562,41 +488,34 @@ def update_task_status(request, task_id):
     if request.method == 'POST':
         new_status = request.POST.get('status')
         
-        with connection.cursor() as cursor:
-            try:
+        if new_status not in ['new', 'in_progress', 'completed']:
+            messages.error(request, 'Некорректный статус задачи')
+            return redirect('project_detail', project_id=project_id)
+
+        try:
+            with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT update_task_status(%s, %s, %s::task_status)",
+                    "CALL update_task_status(%s, %s, %s)",
                     [task_id, request.user.id, new_status]
                 )
-                if cursor.fetchone()[0]:
-                    messages.success(request, 'Статус задачи обновлен')
-            except Exception as e:
-                messages.error(request, str(e))
-
-            # Получаем project_id для редиректа
-            cursor.execute(
-                "SELECT project_id FROM tasks WHERE id = %s",
-                [task_id]
-            )
+                messages.success(request, 'Статус задачи успешно обновлен')
+        except Exception as e:
+            messages.error(request, str(e))
+            
+        # Получаем project_id для редиректа
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT project_id FROM tasks WHERE id = %s", [task_id])
             project_id = cursor.fetchone()[0]
-
-    return redirect('project_detail', project_id=project_id)
+            
+        return redirect('project_detail', project_id=project_id)
+    
+    return redirect('project_list')
 
 @login_required
 def delete_task(request, task_id):
     if request.method == 'POST':
         with connection.cursor() as cursor:
-            try:
-                cursor.execute(
-                    "SELECT delete_task(%s, %s)",
-                    [task_id, request.user.id]
-                )
-                if cursor.fetchone()[0]:
-                    messages.success(request, 'Задача успешно удалена')
-            except Exception as e:
-                messages.error(request, str(e))
-
-            # Получаем project_id для редиректа
+            # Получаем project_id для редиректа до удаления задачи
             cursor.execute(
                 "SELECT project_id FROM tasks WHERE id = %s",
                 [task_id]
@@ -604,8 +523,17 @@ def delete_task(request, task_id):
             result = cursor.fetchone()
             project_id = result[0] if result else None
 
+            try:
+                cursor.execute(
+                    "CALL delete_task(%s, %s)",
+                    [task_id, request.user.id]
+                )
+                messages.success(request, 'Задача успешно удалена')
+            except Exception as e:
+                messages.error(request, str(e))
+
             if not project_id:
-                # Если задача уже удалена, получаем project_id из реферера
+                # Если задача уже удалена или не найдена, получаем project_id из реферера
                 return redirect(request.META.get('HTTP_REFERER', 'project_list'))
 
     return redirect('project_detail', project_id=project_id)

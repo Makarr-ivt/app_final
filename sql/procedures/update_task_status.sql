@@ -1,8 +1,7 @@
-CREATE OR REPLACE FUNCTION public.update_task_status(
+CREATE OR REPLACE PROCEDURE public.update_task_status(
 	p_task_id integer,
 	p_worker_id integer,
 	p_new_status task_status)
-    RETURNS boolean
     LANGUAGE 'plpgsql'
 AS $BODY$
 BEGIN
@@ -19,7 +18,5 @@ BEGIN
     UPDATE tasks
     SET status = p_new_status
     WHERE id = p_task_id;
-
-    RETURN TRUE;
 END;
 $BODY$;
