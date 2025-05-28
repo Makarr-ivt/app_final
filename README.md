@@ -48,7 +48,7 @@ pip install -r requirements.txt
    - `enum_types.sql` - создание пользовательских типов
    - `tables.sql` - создание таблиц
    - `indexes.sql` - создание индексов
-   - Все остальные .sql файлы с функциями
+   - .sql файлы из папки `/functions` и `/procedures`
 
 ### 5. Настройка переменных окружения
 
